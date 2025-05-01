@@ -24,6 +24,15 @@ portfolio/ │ ├── templates/ # HTML Templates ├── static/ # CSS, JS
 - Projects showcase
 - Contact form
 - Clean UI and animations
+- QR code that links to my CV
+
+📎 CV QR Code
+You can scan the QR code below using your phone to open my CV:
+
+
+Make sure to place your actual QR code image at static/images/cv_qr_code.png.
+
+Alternatively, you can access it directly here.
 
 ## 📸 Live Demo
 
