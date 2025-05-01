@@ -21,7 +21,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    path('dkjfbvdsvF3vbdfv4jty09uuHdvFDSt87t37dsvrggH&Uf5yu7efkjYF/', admin.site.urls),
+    path('dkjfbvdsvF3vbdfv4jty09uuHdvFDSt87t37dsvrggHUf5yu7efkjYF/', admin.site.urls),
     path('',include('main.urls')),
     path('', lambda request: redirect('/portfolio/')),     
 

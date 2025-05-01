@@ -4,9 +4,12 @@ from django.shortcuts import render,redirect
 from django.views.generic import ListView
 from django.core.mail import EmailMessage
 from django.http import FileResponse
+from django.utils import timezone
 from django.conf import settings
 from django.urls import reverse
+from user_agents import parse
 from .models import *
+from .utils import *
 from .forms import *
 import qrcode
 import os
@@ -27,17 +30,43 @@ class PortfolioListView(ListView):
                                 # 16.16.217.17/portfolio/
                                 #           ||
                                 #           \/
-        download_url = f'http://{'192.168.15.135:8000'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
+        download_url = f'http://{'192.168.10.15:8000/'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
         
                                 #<--- Change debug to False also 
 
         qr_image = qrcode.make(download_url)
         qr_image_path = 'media/resume_qr.png'
         qr_image.save(qr_image_path)
+        qr_model = QRmodel.objects.create(qr_img ='resume_qr.png')
 
-        qr_model = QRmodel.objects.create(qr_img='resume_qr.png')
+        user_agent_str = get_client_ip_divice(request)
+        user_agent = parse(user_agent_str)
 
+        device = {
+            "is_mobile": user_agent.is_mobile,
+            "is_tablet": user_agent.is_tablet,
+            "is_pc": user_agent.is_pc,
+            "os": user_agent.os.family,         # e.g. 'iOS', 'Windows'
+            "browser": user_agent.browser.family,  # e.g. 'Safari', 'Chrome'
+            "device": user_agent.device.family     # e.g. 'iPhone'
+        }
+        ip = get_client_ip(request)
 
+        print(device)
+
+        if not VisitorJustEnterIP.objects.filter(            
+            ip_address=ip,
+            os=user_agent.os.family,
+            browser=user_agent.browser.family,
+            device=user_agent.device.family).exists():
+
+            VisitorJustEnterIP.objects.create(
+            ip_address=ip,
+            timestamp = timezone.now(),
+            os=user_agent.os.family,
+            browser=user_agent.browser.family,
+            device=user_agent.device.family)
+        
         context = {
             'personal_info':personal_info,
             'education':education,
@@ -62,12 +91,22 @@ class PortfolioListView(ListView):
         services = Services.objects.all()
         projects = Projects.objects.all()
         footer_info = Footer_info.objects.get()
+
         form = ContactMessageForm(request.POST)
-        user_email = ContactModel.objects.all()
-        emaill = request.POST.get('email')
-        ls = []
-        for i in user_email:
-            ls.append(i.email)
+
+                                # 16.16.217.17/portfolio/
+                                #           ||
+                                #           \/
+        download_url = f'http://{'192.168.15.135:8000'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
+        
+                                #<--- Change debug to False also 
+
+        qr_image = qrcode.make(download_url)
+        qr_image_path = 'media/resume_qr.png'
+        qr_image.save(qr_image_path)
+
+        qr_model = QRmodel.objects.create(qr_img ='resume_qr.png')
+
         context = {
             'personal_info':personal_info,
             'education':education,
@@ -76,9 +115,17 @@ class PortfolioListView(ListView):
             'skills_diagram':skills_diagram,
             'services':services,
             'projects':projects,
-            'footer_info':footer_info
+            'footer_info':footer_info,
+            'qr_model': qr_model
+
         }
-        if form.is_valid() and emaill not in ls:
+
+        ip = get_client_ip(request)
+
+        if form.is_valid() and not VisitorIP.objects.filter(ip_address=ip).exists():
+
+            VisitorIP.objects.create(ip_address = ip,timestamp = timezone.now())
+
             form.save()
             email = EmailMessage(
                 subject = f'Admininstrative unswer to {request.POST.get('name')}',
@@ -99,13 +146,14 @@ class PortfolioListView(ListView):
             return redirect('portfolio')
 
         else:
-            if emaill in ls:
-                context['message'] = "You can't send more than one message with same email"
+            if VisitorIP.objects.filter(ip_address=ip).exists():
+                context['message'] = 'You can send message only once. If you have more questions please write directly'
                 return render(request,'index.html',context)
             else:
                 context['message'] = form.errors
 
-                render(request,'index.html',context)
+                return render(request,'index.html',context)
+
 
 
 def download_resume(request):
