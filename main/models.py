@@ -118,3 +118,7 @@ class Footer_info(models.Model):
     
     def __str__(self):
         return 'Footer'
+    
+class QRmodel(models.Model):
+    qr_img = models.ImageField('Image',upload_to='Images')
+    

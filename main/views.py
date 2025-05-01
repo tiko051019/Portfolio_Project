@@ -1,10 +1,15 @@
 from Portfolio_Project.settings import EMAIL_HOST_USER
+from django.contrib.sites.models import Site
 from django.shortcuts import render,redirect
 from django.views.generic import ListView
 from django.core.mail import EmailMessage
+from django.http import FileResponse
 from django.conf import settings
+from django.urls import reverse
 from .models import *
 from .forms import *
+import qrcode
+import os
 
 class PortfolioListView(ListView):
     template_name = 'index.html'
@@ -19,7 +24,18 @@ class PortfolioListView(ListView):
         projects = Projects.objects.all()
         footer_info = Footer_info.objects.get()
 
+                                # 16.16.217.17/portfolio/
+                                #           ||
+                                #           \/
+        download_url = f'http://{'192.168.15.135:8000'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
         
+                                #<--- Change debug to False also 
+
+        qr_image = qrcode.make(download_url)
+        qr_image_path = 'media/resume_qr.png'
+        qr_image.save(qr_image_path)
+
+        qr_model = QRmodel.objects.create(qr_img='resume_qr.png')
 
 
         context = {
@@ -30,7 +46,8 @@ class PortfolioListView(ListView):
             'skills_diagram':skills_diagram,
             'services':services,
             'projects':projects,
-            'footer_info':footer_info
+            'footer_info':footer_info,
+            'qr_model': qr_model
         }
 
         return render(request,self.template_name,context)
@@ -91,12 +108,26 @@ class PortfolioListView(ListView):
                 render(request,'index.html',context)
 
 
-def profile(request):
-    return render(request, 'your_template.html', {
-        'MEDIA_URL': settings.MEDIA_URL,
-    })
-
+def download_resume(request):
+    file_path = os.path.join('static', 'files', 'Tigran_Abrahamyan_CV.pdf')
+    response = FileResponse(open(file_path, 'rb'), as_attachment=True)
+    return response
 
 
 def Page404(request):
-    return render(request,'404.html')                            
+    return render(request,'404.html')   
+
+
+def cv(request):
+    return render(request,'cv.html')
+
+
+
+
+
+
+
+
+
+
+
