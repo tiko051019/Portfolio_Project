@@ -1,5 +1,4 @@
 from Portfolio_Project.settings import EMAIL_HOST_USER
-from django.contrib.sites.models import Site
 from django.shortcuts import render,redirect
 from django.views.generic import ListView
 from django.core.mail import EmailMessage
