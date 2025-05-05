@@ -47,7 +47,6 @@ class PortfolioListView(ListView):
         ipv4 = get_client_ipv4(request)
         user_agent_str = get_client_ipv4_divice(request) 
         user_agent = parse(user_agent_str)
-        print(user_agent)
 
         ip_public = show_ip(request)
         geolocation = get_geo_location(ip_public)
