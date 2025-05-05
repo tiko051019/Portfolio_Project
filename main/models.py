@@ -123,19 +123,28 @@ class QRmodel(models.Model):
     qr_img = models.ImageField('Image',upload_to='Images')
     
 
-class VisitorIP(models.Model):
+class VisitorWriterIP(models.Model):
     ip_address = models.GenericIPAddressField("ip")
     timestamp = models.DateTimeField("time")
 
     def __str__(self):
         return f'{self.ip_address}'
     
-class VisitorJustEnterIP(models.Model):
-    ip_address = models.GenericIPAddressField()
-    timestamp = models.DateTimeField('time')
-    os = models.CharField(max_length=100, blank=True)
-    browser = models.CharField(max_length=100, blank=True)
-    device = models.CharField(max_length=100, blank=True)
+    
+
+class VisitorData(models.Model):
+    ipv4 = models.GenericIPAddressField(null = True)
+    ipv6 = models.GenericIPAddressField(null = True)
+    os = models.CharField(max_length=100, blank=True,null = True)
+    browser = models.CharField(max_length=100, blank=True,null = True)
+    device = models.CharField(max_length=100, blank=True,null = True)
+    hostname = models.CharField(max_length=255, blank=True, null=True)
+    city = models.CharField(max_length=100, blank=True, null=True)
+    region = models.CharField(max_length=100, blank=True, null=True)
+    country = models.CharField(max_length=10, blank=True, null=True)
+    loc = models.CharField(max_length=50, help_text="Latitude,Longitude", blank=True, null=True)
+    org = models.CharField(max_length=255, blank=True, null=True)
+    timestamp = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return f'{self.device}'
+        return f"{self.ipv6} - {self.city}, {self.country}"

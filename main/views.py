@@ -27,10 +27,12 @@ class PortfolioListView(ListView):
         projects = Projects.objects.all()
         footer_info = Footer_info.objects.get()
 
+        #-----------------------------------QR Code-------------------------------------
+
                                 # 16.16.217.17/portfolio/
                                 #           ||
                                 #           \/
-        download_url = f'http://{'192.168.10.15:8000/'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
+        download_url = f'http://{'192.168.225.135:8000'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
         
                                 #<--- Change debug to False also 
 
@@ -39,33 +41,55 @@ class PortfolioListView(ListView):
         qr_image.save(qr_image_path)
         qr_model = QRmodel.objects.create(qr_img ='resume_qr.png')
 
-        user_agent_str = get_client_ip_divice(request)
+        #-------------------------------------------------------------------------------
+        #-----------------------Geting data of just entered users-----------------------
+
+        ipv4 = get_client_ipv4(request)
+        user_agent_str = get_client_ipv4_divice(request) 
         user_agent = parse(user_agent_str)
+        print(user_agent)
 
-        device = {
-            "is_mobile": user_agent.is_mobile,
-            "is_tablet": user_agent.is_tablet,
-            "is_pc": user_agent.is_pc,
-            "os": user_agent.os.family,         # e.g. 'iOS', 'Windows'
-            "browser": user_agent.browser.family,  # e.g. 'Safari', 'Chrome'
-            "device": user_agent.device.family     # e.g. 'iPhone'
-        }
-        ip = get_client_ip(request)
+        ip_public = show_ip(request)
+        geolocation = get_geo_location(ip_public)
 
-        print(device)
+        device_type = user_agent.device.family
+        if device_type == "Other":
+            if user_agent.is_pc:
+                device_type = "PC"
+            elif user_agent.is_mobile:
+                device_type = "Mobile"
+            elif user_agent.is_tablet:
+                device_type = "Tablet"
 
-        if not VisitorJustEnterIP.objects.filter(            
-            ip_address=ip,
+        if not VisitorData.objects.filter(
+        ipv4=ipv4,
+        ipv6=geolocation.get("ip"), 
+        os=user_agent.os.family,
+        browser=user_agent.browser.family,
+        device=device_type,
+        hostname=geolocation.get("hostname"),
+        city=geolocation.get("city"),
+        region=geolocation.get("region"),
+        country=geolocation.get("country"),
+        loc=geolocation.get("loc"),
+        org=geolocation.get("org")).exists():
+        
+            VisitorData.objects.create(
+            ipv4=ipv4,
+            ipv6=geolocation.get("ip"), 
             os=user_agent.os.family,
             browser=user_agent.browser.family,
-            device=user_agent.device.family).exists():
+            device=device_type,
+            hostname=geolocation.get("hostname"),
+            city=geolocation.get("city"),
+            region=geolocation.get("region"),
+            country=geolocation.get("country"),
+            loc=geolocation.get("loc"),
+            org=geolocation.get("org"),
+            timestamp=timezone.now())
 
-            VisitorJustEnterIP.objects.create(
-            ip_address=ip,
-            timestamp = timezone.now(),
-            os=user_agent.os.family,
-            browser=user_agent.browser.family,
-            device=user_agent.device.family)
+        #-------------------------------------------------------------------------------
+        #-------------------------------------------------------------------------------
         
         context = {
             'personal_info':personal_info,
@@ -97,7 +121,7 @@ class PortfolioListView(ListView):
                                 # 16.16.217.17/portfolio/
                                 #           ||
                                 #           \/
-        download_url = f'http://{'192.168.15.135:8000'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
+        download_url = f'http://{'192.168.225.135:8000/'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
         
                                 #<--- Change debug to False also 
 
@@ -122,9 +146,9 @@ class PortfolioListView(ListView):
 
         ip = get_client_ip(request)
 
-        if form.is_valid() and not VisitorIP.objects.filter(ip_address=ip).exists():
+        if form.is_valid() and not VisitorWriterIP.objects.filter(ip_address=ip).exists():
 
-            VisitorIP.objects.create(ip_address = ip,timestamp = timezone.now())
+            VisitorWriterIP.objects.create(ip_address = ip,timestamp = timezone.now())
 
             form.save()
             email = EmailMessage(
@@ -146,7 +170,7 @@ class PortfolioListView(ListView):
             return redirect('portfolio')
 
         else:
-            if VisitorIP.objects.filter(ip_address=ip).exists():
+            if VisitorWriterIP.objects.filter(ip_address=ip).exists():
                 context['message'] = 'You can send message only once. If you have more questions please write directly'
                 return render(request,'index.html',context)
             else:
