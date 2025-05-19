@@ -26,22 +26,16 @@ class PortfolioListView(ListView):
         projects = Projects.objects.all()
         footer_info = Footer_info.objects.get()
 
-        #-----------------------------------QR Code-------------------------------------
-
-                                # 16.16.217.17/portfolio/
-                                #           ||
-                                #           \/
-        download_url = f'http://{'192.168.225.135:8000'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
-        
-                                #<--- Change debug to False also 
+        download_url = f'{request.get_host()}{reverse("cv")}' 
+        print(download_url)   
+                
 
         qr_image = qrcode.make(download_url)
         qr_image_path = 'media/resume_qr.png'
         qr_image.save(qr_image_path)
         qr_model = QRmodel.objects.create(qr_img ='resume_qr.png')
 
-        #-------------------------------------------------------------------------------
-        #-----------------------Geting data of just entered users-----------------------
+
 
         ipv4 = get_client_ipv4(request)
         user_agent_str = get_client_ipv4_divice(request) 
@@ -116,12 +110,8 @@ class PortfolioListView(ListView):
 
         form = ContactMessageForm(request.POST)
 
-                                # 16.16.217.17/portfolio/
-                                #           ||
-                                #           \/
-        download_url = f'http://{'192.168.225.135:8000/'}{reverse("cv")}'    #<---change to real link?????????????????????????????????????
-        
-                                #<--- Change debug to False also 
+
+        download_url = f'{request.get_host()}{reverse("cv")}'    
 
         qr_image = qrcode.make(download_url)
         qr_image_path = 'media/resume_qr.png'
