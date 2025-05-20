@@ -26,7 +26,7 @@ class PortfolioListView(ListView):
         projects = Projects.objects.all()
         footer_info = Footer_info.objects.get()
 
-        download_url = f'{request.get_host()}{reverse("cv")}' 
+        download_url = f'{request.scheme}://{request.get_host()}{reverse("cv")}'
         print(download_url)   
                 
 
