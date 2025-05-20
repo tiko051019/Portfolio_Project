@@ -179,7 +179,8 @@ def Page404(request):
 
 
 def cv(request):
-    return render(request,'cv.html')
+    cv = PersonalInfo.objects.get()
+    return render(request,'cv.html',{'cv':cv})
 
 
 

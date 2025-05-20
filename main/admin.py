@@ -12,3 +12,4 @@ admin.site.register(ContactModel)
 admin.site.register(Footer_info)
 admin.site.register(VisitorWriterIP)
 admin.site.register(VisitorData)
+

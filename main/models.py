@@ -18,6 +18,7 @@ class PersonalInfo(models.Model):
     skill1 = models.CharField('Skill1',max_length=100)
     skill2 = models.CharField('Skill2',max_length=100)
     skill3 = models.CharField('Skill3',max_length=100)
+    CV_image = models.ImageField('CV',upload_to='Images',null=True)
 
     def __str__(self):
         return self.name
