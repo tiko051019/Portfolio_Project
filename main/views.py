@@ -54,7 +54,6 @@ class PortfolioListView(ListView):
                 device_type = "Tablet"
 
         if not VisitorData.objects.filter(
-        ipv4=ipv4,
         ipv6=geolocation.get("ip"), 
         os=user_agent.os.family,
         browser=user_agent.browser.family,
