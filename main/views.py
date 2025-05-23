@@ -43,7 +43,7 @@ class PortfolioListView(ListView):
 
         ip_public = show_ip(request)
         geolocation = get_geo_location(ip_public)
-
+        
         device_type = user_agent.device.family
         if device_type == "Other":
             if user_agent.is_pc:
@@ -54,16 +54,7 @@ class PortfolioListView(ListView):
                 device_type = "Tablet"
 
         if not VisitorData.objects.filter(
-        ipv6=geolocation.get("ip"), 
-        os=user_agent.os.family,
-        browser=user_agent.browser.family,
-        device=device_type,
-        hostname=geolocation.get("hostname"),
-        city=geolocation.get("city"),
-        region=geolocation.get("region"),
-        country=geolocation.get("country"),
-        loc=geolocation.get("loc"),
-        org=geolocation.get("org")).exists():
+        ipv6=geolocation.get("ip")).exists():
         
             VisitorData.objects.create(
             ipv4=ipv4,
