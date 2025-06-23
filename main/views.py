@@ -55,6 +55,16 @@ class PortfolioListView(ListView):
 
         if not VisitorData.objects.filter(
         ipv6=geolocation.get("ip")).exists():
+        # os=user_agent.os.family,
+        # browser=user_agent.browser.family,
+        # device=device_type,
+        # hostname=geolocation.get("hostname"),
+        # city=geolocation.get("city"),
+        # region=geolocation.get("region"),
+        # country=geolocation.get("country"),
+        # loc=geolocation.get("loc"),
+        # org=geolocation.get("org")
+        
         
             VisitorData.objects.create(
             ipv4=ipv4,
