@@ -43,7 +43,7 @@ class Education(models.Model):
 
 class Experience(models.Model):
     start_year = models.IntegerField('Start Year')
-    end_year = models.IntegerField('End Year')
+    end_year = models.CharField('End Year',max_length=10)
     experience = models.CharField('Experience',max_length=255)
     univer = models.CharField('Univer',max_length=255)
     description = models.TextField('Description')
